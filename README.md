@@ -51,6 +51,8 @@ cmake --build build --config Release
 
 仓库包含 VS Code 调试配置。打开项目后选择 `Debug econv (--help)`，会先构建 Debug 版本，再用 MSVC 调试器启动 `econv.exe`。
 
+Windows 下生成 Visual Studio 项目、解决方案和 VS Code 调试的完整步骤见 [Windows 构建与调试](docs/windows-build.md)。
+
 ## 用法
 
 仅检测编码：
