@@ -8,6 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(econv src/main.cpp)
 
+enable_testing()
+
 find_package(Iconv REQUIRED)
 
 find_package(uchardet CONFIG QUIET)
@@ -48,3 +50,9 @@ target_compile_options(econv PRIVATE
   $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>)
 
 install(TARGETS econv RUNTIME DESTINATION bin)
+
+if(WIN32)
+  add_test(
+    NAME manual-smoke
+    COMMAND powershell -ExecutionPolicy Bypass -File "${CMAKE_SOURCE_DIR}/scripts/manual-test.ps1" -Configuration $<CONFIG>)
+endif()

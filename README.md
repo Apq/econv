@@ -53,6 +53,21 @@ cmake --build build --config Release
 
 Windows 下生成 Visual Studio 项目、解决方案和 VS Code 调试的完整步骤见 [Windows 构建与调试](docs/windows-build.md)。
 
+## 测试
+
+Windows 下先构建 Debug 版本，然后运行手工冒烟测试脚本：
+
+```powershell
+cmake --build --preset windows-debug
+.\scripts\manual-test.ps1 -Configuration Debug
+```
+
+也可以通过 CTest 运行：
+
+```powershell
+ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
+```
+
 ## 用法
 
 仅检测编码：
