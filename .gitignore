@@ -28,3 +28,13 @@
 *.out
 *.app
 
+# CMake
+build/
+build-*/
+cmake-build-*/
+CMakeUserPresets.json
+.vs/
+
+# Local session exports
+20??-??-??.json
+

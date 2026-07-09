@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug econv (--help)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/windows-msvc-vcpkg/Debug/econv.exe",
+      "args": [
+        "--help"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "preLaunchTask": "cmake: build debug"
+    }
+  ]
+}

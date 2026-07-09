@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "cmake: configure local",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--preset",
+        "windows-msvc-vcpkg"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "cmake: build debug",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "--preset",
+        "windows-debug"
+      ],
+      "dependsOn": "cmake: configure local",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
