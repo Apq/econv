@@ -1,6 +1,7 @@
 param(
     [switch]$SkipRebuild,
-    [switch]$KeepStaging
+    [switch]$KeepStaging,
+    [string]$OutputDirectory
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,7 +11,11 @@ $buildScript = Join-Path $PSScriptRoot 'build.ps1'
 $buildRoot = Join-Path $repoRoot 'build/windows-msvc-vcpkg'
 $releaseDir = Join-Path $buildRoot 'Release'
 $installedRoot = Join-Path $buildRoot 'vcpkg_installed/x64-windows'
-$distDir = Join-Path $repoRoot 'dist'
+$distDir = if ($OutputDirectory) {
+    [System.IO.Path]::GetFullPath($OutputDirectory, $repoRoot)
+} else {
+    Join-Path $repoRoot 'dist'
+}
 
 function Invoke-Checked {
     param(
@@ -90,9 +95,7 @@ if (Test-Path -LiteralPath $zipChecksumPath) {
     Remove-Item -LiteralPath $zipChecksumPath -Force
 }
 
-$licensesDir = Join-Path $stagingDir 'licenses'
-$docsDir = Join-Path $stagingDir 'docs'
-New-Item -ItemType Directory -Path $licensesDir, $docsDir -Force | Out-Null
+New-Item -ItemType Directory -Path $stagingDir -Force | Out-Null
 
 Write-Host "==> Collecting release files"
 Copy-RequiredFile $exe $stagingDir
@@ -101,12 +104,34 @@ Copy-RequiredFile (Join-Path $releaseDir 'uchardet.dll') $stagingDir
 Copy-RequiredFile (Join-Path $repoRoot 'README.md') $stagingDir
 Copy-RequiredFile (Join-Path $repoRoot 'LICENSE') (Join-Path $stagingDir 'LICENSE.txt')
 Copy-RequiredFile (Join-Path $repoRoot 'THIRD-PARTY-NOTICES.md') $stagingDir
-Copy-RequiredFile (Join-Path $repoRoot 'docs/windows-build.md') $docsDir
 
-Copy-RequiredFile (Join-Path $installedRoot 'share/uchardet/copyright') (Join-Path $licensesDir 'uchardet-LICENSE.txt')
-Copy-RequiredFile (Join-Path $installedRoot 'share/libiconv/copyright') (Join-Path $licensesDir 'libiconv-LICENSE.txt')
-Copy-RequiredFile (Join-Path $installedRoot 'share/uchardet/vcpkg.spdx.json') (Join-Path $licensesDir 'uchardet-vcpkg.spdx.json')
-Copy-RequiredFile (Join-Path $installedRoot 'share/libiconv/vcpkg.spdx.json') (Join-Path $licensesDir 'libiconv-vcpkg.spdx.json')
+$uchardetLicensePath = Join-Path $installedRoot 'share/uchardet/copyright'
+$libiconvLicensePath = Join-Path $installedRoot 'share/libiconv/copyright'
+if (-not (Test-Path -LiteralPath $uchardetLicensePath -PathType Leaf)) {
+    throw "uchardet license file not found: $uchardetLicensePath"
+}
+if (-not (Test-Path -LiteralPath $libiconvLicensePath -PathType Leaf)) {
+    throw "libiconv license file not found: $libiconvLicensePath"
+}
+
+$thirdPartyLicenses = @(
+    'THIRD-PARTY LICENSES',
+    '====================',
+    '',
+    'uchardet 0.0.8',
+    'Source: https://gitlab.freedesktop.org/uchardet/uchardet',
+    '----------------',
+    (Get-Content -LiteralPath $uchardetLicensePath -Raw),
+    '',
+    'GNU libiconv 1.19',
+    'Source: https://git.savannah.gnu.org/git/libiconv.git',
+    '-----------------',
+    (Get-Content -LiteralPath $libiconvLicensePath -Raw)
+) -join "`n"
+[System.IO.File]::WriteAllText(
+    (Join-Path $stagingDir 'THIRD-PARTY-LICENSES.txt'),
+    $thirdPartyLicenses,
+    [System.Text.UTF8Encoding]::new($false))
 
 $requirements = @"
 econv $version - Windows x64
@@ -120,19 +145,6 @@ The package includes the required uchardet and GNU libiconv DLLs.
 [System.IO.File]::WriteAllText(
     (Join-Path $stagingDir 'REQUIREMENTS.txt'),
     $requirements,
-    [System.Text.UTF8Encoding]::new($false))
-
-$payloadFiles = Get-ChildItem -LiteralPath $stagingDir -File -Recurse |
-    Where-Object { $_.Name -ne 'SHA256SUMS.txt' } |
-    Sort-Object FullName
-$checksumLines = foreach ($file in $payloadFiles) {
-    $relativePath = [System.IO.Path]::GetRelativePath($stagingDir, $file.FullName).Replace('\', '/')
-    $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-    "$hash  $relativePath"
-}
-[System.IO.File]::WriteAllLines(
-    (Join-Path $stagingDir 'SHA256SUMS.txt'),
-    $checksumLines,
     [System.Text.UTF8Encoding]::new($false))
 
 Invoke-Checked 'Packaged executable smoke check' {
@@ -156,14 +168,23 @@ try {
         "$packageName/uchardet.dll",
         "$packageName/LICENSE.txt",
         "$packageName/THIRD-PARTY-NOTICES.md",
-        "$packageName/licenses/uchardet-LICENSE.txt",
-        "$packageName/licenses/libiconv-LICENSE.txt",
-        "$packageName/SHA256SUMS.txt"
+        "$packageName/THIRD-PARTY-LICENSES.txt",
+        "$packageName/REQUIREMENTS.txt"
     )
     $archiveEntries = @($archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
     foreach ($entry in $expectedEntries) {
         if ($archiveEntries -notcontains $entry) {
             throw "ZIP validation failed; missing entry: $entry"
+        }
+    }
+    $forbiddenEntries = @(
+        "$packageName/SHA256SUMS.txt",
+        "$packageName/docs/",
+        "$packageName/licenses/"
+    )
+    foreach ($entry in $forbiddenEntries) {
+        if ($archiveEntries | Where-Object { $_.StartsWith($entry) }) {
+            throw "ZIP validation failed; forbidden entry found: $entry"
         }
     }
 } finally {

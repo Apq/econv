@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-`econv` uses the following open-source libraries. Their complete license texts are included in release packages under the `licenses/` directory.
+`econv` uses the following open-source libraries. Their complete license texts are included in release packages as `THIRD-PARTY-LICENSES.txt`.
 
 ## uchardet
 
@@ -17,4 +17,4 @@
 - Version used by vcpkg: 1.19
 - License: the libiconv and libcharset libraries and headers are licensed under LGPL 2.1 or later; the standalone iconv program and documentation are licensed under GPL. `econv` links to the library.
 
-The release package copies the license and copyright files supplied by vcpkg for the exact installed packages.
+The release package combines the license and copyright files supplied by vcpkg for the exact installed packages into one file.

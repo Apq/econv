@@ -92,7 +92,7 @@ ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
 
 对应的 `.bat` 文件可以直接双击或在命令行调用。版本脚本支持 `-DryRun` 预览，不修改文件。
 
-发布脚本会把 ZIP 和 SHA-256 校验文件生成到 `dist/`，其中包含 EXE、运行时 DLL、README、构建文档、项目许可证和第三方许可证。使用 `-SkipRebuild` 可跳过全量重建，使用 `-KeepStaging` 可保留打包暂存目录。
+发布脚本会把 ZIP 和 SHA-256 校验文件生成到 `dist/`，其中包含 EXE、运行时 DLL、README、项目许可证、第三方声明和合并后的第三方许可证。使用 `-SkipRebuild` 可跳过全量重建，使用 `-KeepStaging` 可保留打包暂存目录，使用 `-OutputDirectory <path>` 可指定输出目录。
 
 ## 用法
 
