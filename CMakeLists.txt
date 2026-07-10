@@ -1,12 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(econv VERSION 0.1.0 LANGUAGES CXX)
+project(econv VERSION 0.1.2026.710 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-add_executable(econv src/main.cpp)
+set(ECONV_SOURCES src/main.cpp)
+
+if(WIN32)
+  enable_language(RC)
+  configure_file(src/version.rc.in version.rc @ONLY)
+  list(APPEND ECONV_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version.rc")
+endif()
+
+add_executable(econv ${ECONV_SOURCES})
+target_compile_definitions(econv PRIVATE ECONV_VERSION="${PROJECT_VERSION}")
 
 enable_testing()
 

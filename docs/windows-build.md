@@ -60,6 +60,40 @@ build/windows-msvc-vcpkg/Debug/econv.exe
 build/windows-msvc-vcpkg/Release/econv.exe
 ```
 
+也可以使用仓库提供的编译脚本：
+
+```powershell
+.\scripts\build.ps1
+.\scripts\build.ps1 -Configuration Debug
+.\scripts\build.ps1 -Rebuild
+```
+
+`scripts/build.bat` 是对应的批处理入口。脚本会自动使用 `VCPKG_ROOT`，未设置时尝试查找 Visual Studio 自带的 vcpkg。
+
+## 版本管理
+
+版本格式为 `Major.Minor.Year.MMDD`，例如 `0.1.2026.710`。版本号会写入：
+
+```text
+CMakeLists.txt
+vcpkg.json
+econv.exe 的 Windows 文件版本信息
+```
+
+设置主版本和次版本：
+
+```powershell
+.\scripts\set-version.ps1 0 2
+```
+
+次版本自动加 1：
+
+```powershell
+.\scripts\bump-version.ps1
+```
+
+日期部分由脚本按当天日期自动生成。两个脚本均支持 `-DryRun`，对应的 `.bat` 文件可直接调用。
+
 ## 用 Visual Studio 打开
 
 可以直接打开生成的解决方案文件：

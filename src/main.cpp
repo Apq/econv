@@ -25,6 +25,10 @@
 #include <string_view>
 #include <vector>
 
+#ifndef ECONV_VERSION
+#define ECONV_VERSION "unknown"
+#endif
+
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
@@ -97,6 +101,7 @@ void print_help(std::ostream& os) {
        << "      --detect-only        print detected encoding and exit\n"
        << "      --fallback <mode>    strict, ignore, or translit; default: strict\n"
        << "      --emit-bom           prepend BOM for explicit UTF target encodings\n"
+       << "      --version            show version\n"
        << "  -h, --help               show this help\n";
 }
 
@@ -128,6 +133,9 @@ Options parse_args(int argc, char** argv) {
 
         if (arg == "-h" || arg == "--help") {
             print_help(std::cout);
+            std::exit(0);
+        } else if (arg == "--version") {
+            std::cout << "econv " << ECONV_VERSION << '\n';
             std::exit(0);
         } else if (arg == "-i" || arg == "--input") {
             options.inputPath = require_value(arg);

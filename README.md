@@ -68,6 +68,27 @@ cmake --build --preset windows-debug
 ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
 ```
 
+## 版本管理与编译脚本
+
+项目版本格式为 `Major.Minor.Year.MMDD`，例如 `0.1.2026.710`。版本同时写入 CMake、vcpkg manifest 和 Windows EXE 文件属性。
+
+```powershell
+# 设置主版本和次版本，日期部分自动使用当天日期
+.\scripts\set-version.ps1 0 2
+
+# 次版本加 1，日期部分自动使用当天日期
+.\scripts\bump-version.ps1
+
+# 构建 Release（默认）
+.\scripts\build.ps1
+
+# 构建 Debug 或执行全量重建
+.\scripts\build.ps1 -Configuration Debug
+.\scripts\build.ps1 -Rebuild
+```
+
+对应的 `.bat` 文件可以直接双击或在命令行调用。版本脚本支持 `-DryRun` 预览，不修改文件。
+
 ## 用法
 
 仅检测编码：
@@ -111,6 +132,7 @@ econv -i input.txt -o output.txt -t ISO-8859-1 --fallback ignore
       --detect-only        打印检测到的编码并退出
       --fallback <mode>    strict、ignore 或 translit；默认值：strict
       --emit-bom           为 UTF-8/UTF-16LE/UTF-16BE/UTF-32LE/UTF-32BE 添加 BOM 前缀
+      --version            显示版本号
   -h, --help               显示帮助
 ```
 
