@@ -99,6 +99,22 @@ ctest --preset macos-arm64-tests
 
 Linux/macOS 的构建、测试和 `tar.gz` 发布方式见 [Unix 构建与发布](docs/unix-build.md)。
 
+## CI 与 GitHub Release
+
+仓库通过 GitHub Actions 在 Windows x64、Linux x64、macOS arm64 和 macOS x64 上执行 Release 构建、CTest 冒烟测试和发布包校验。工作流仅在以下情况运行：
+
+- 推送 `v<版本>` 格式的数字版本标签，例如 `v0.1` 或 `v0.1.2026.710`。
+- 在 Actions 页面手动运行。
+
+推送版本标签时，工作流构建该标签指向的源码并发布对应的 GitHub Release，例如：
+
+```bash
+git tag v0.1
+git push origin v0.1
+```
+
+手动运行时，工作流按版本顺序选择仓库中最大的有效版本标签；如果仓库还没有版本标签，则使用 `v0.1`，并以手动运行时选择的 ref 作为源码。工作流会等待四个平台全部构建和测试通过，然后创建或更新 GitHub Release，自动生成发布说明，并上传各平台压缩包及其 SHA-256 校验文件。压缩包文件名仍使用 `CMakeLists.txt` 和 `vcpkg.json` 中的完整项目版本。
+
 ## 用法
 
 仅检测编码：
