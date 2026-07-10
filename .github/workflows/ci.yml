@@ -42,6 +42,7 @@ jobs:
 
           if [[ "$EVENT_NAME" == "push" ]]; then
             release_tag="$REF_NAME"
+            source_sha="$EVENT_SHA"
           else
             release_tag=""
             while IFS= read -r tag; do
@@ -51,6 +52,7 @@ jobs:
               fi
             done < <(git tag --list 'v*' --sort=-version:refname)
             release_tag="${release_tag:-v0.1}"
+            source_sha="$EVENT_SHA"
           fi
 
           if [[ ! "$release_tag" =~ ^v[0-9]+(\.[0-9]+)+$ ]]; then
@@ -59,10 +61,8 @@ jobs:
           fi
 
           if git show-ref --verify --quiet "refs/tags/$release_tag"; then
-            source_sha="$(git rev-list -n 1 "$release_tag")"
             tag_exists=true
           else
-            source_sha="$EVENT_SHA"
             tag_exists=false
           fi
 

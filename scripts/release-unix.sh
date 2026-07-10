@@ -131,22 +131,20 @@ cp THIRD-PARTY-NOTICES.md "$staging_dir/THIRD-PARTY-NOTICES.md"
 
 installed_root="$build_dir/vcpkg_installed/$triplet"
 uchardet_license="$installed_root/share/uchardet/copyright"
-libiconv_license="$installed_root/share/libiconv/copyright"
 [[ -f "$uchardet_license" ]] || { echo "Missing license: $uchardet_license" >&2; exit 1; }
-[[ -f "$libiconv_license" ]] || { echo "Missing license: $libiconv_license" >&2; exit 1; }
 {
   printf '%s\n\n' 'THIRD-PARTY LICENSES' '===================='
   printf '%s\n%s\n%s\n' 'uchardet 0.0.8' 'Source: https://gitlab.freedesktop.org/uchardet/uchardet' '----------------'
   cat "$uchardet_license"
-  printf '\n\n%s\n%s\n%s\n' 'GNU libiconv 1.19' 'Source: https://git.savannah.gnu.org/git/libiconv.git' '-----------------'
-  cat "$libiconv_license"
+  printf '\n\n%s\n%s\n' 'System iconv implementation' '---------------------------'
+  printf '%s\n' 'Provided by the target operating system and not redistributed in this package.'
 } > "$staging_dir/THIRD-PARTY-LICENSES.txt"
 
 cat > "$staging_dir/REQUIREMENTS.txt" <<EOF
 econv $version - $platform
 
 This package contains a native executable for $platform.
-The uchardet and GNU libiconv libraries are linked by the platform build.
+The package includes uchardet and uses the iconv implementation provided by the target operating system.
 EOF
 
 "$staging_dir/econv" --version
