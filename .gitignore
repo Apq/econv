@@ -38,3 +38,6 @@ CMakeUserPresets.json
 # Local session exports
 20??-??-??.json
 
+# Release packages
+dist/
+

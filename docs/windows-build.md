@@ -94,6 +94,41 @@ econv.exe 的 Windows 文件版本信息
 
 日期部分由脚本按当天日期自动生成。两个脚本均支持 `-DryRun`，对应的 `.bat` 文件可直接调用。
 
+## 生成发布包
+
+运行：
+
+```powershell
+.\scripts\release.ps1
+```
+
+脚本会自动完成：
+
+1. Release 全量构建。
+2. 执行 CTest。
+3. 校验 EXE、CMake 与 vcpkg manifest 的版本一致。
+4. 收集 `econv.exe`、`iconv-2.dll` 和 `uchardet.dll`。
+5. 收集 README、构建文档、项目许可证、第三方许可证和 vcpkg SPDX 文件。
+6. 生成包内文件的 SHA-256 清单。
+7. 生成 Windows x64 ZIP，并生成 ZIP 的 `.sha256` 文件。
+8. 校验 ZIP 中的必要文件。
+
+发布产物输出到：
+
+```text
+dist/econv-<version>-windows-x64.zip
+dist/econv-<version>-windows-x64.zip.sha256
+```
+
+可选参数：
+
+```powershell
+.\scripts\release.ps1 -SkipRebuild
+.\scripts\release.ps1 -KeepStaging
+```
+
+`scripts/release.bat` 是双击入口。`release.ps1` 使用 UTF-8 无 BOM和 LF，`.bat` 使用无 BOM 和 CRLF；`.gitattributes` 会固定这两类文件的换行格式。
+
 ## 用 Visual Studio 打开
 
 可以直接打开生成的解决方案文件：
