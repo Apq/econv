@@ -19,18 +19,27 @@ if (-not $env:VCPKG_ROOT) {
 
 $presetName = if ($Configuration -eq 'Debug') { 'windows-debug' } else { 'windows-release' }
 
-Write-Host "Configuring (preset: windows-msvc-vcpkg)..."
-& cmake --preset windows-msvc-vcpkg
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Push-Location -LiteralPath $repoRoot
+try {
+    Write-Host "Configuring (preset: windows-msvc-vcpkg)..."
+    & cmake --preset windows-msvc-vcpkg
+    if ($LASTEXITCODE -ne 0) {
+        throw "CMake configure failed with exit code $LASTEXITCODE"
+    }
 
-if ($Rebuild) {
-    Write-Host "Cleaning and building ($Configuration)..."
-    & cmake --build --preset $presetName --clean-first
-} else {
-    Write-Host "Building ($Configuration)..."
-    & cmake --build --preset $presetName
+    if ($Rebuild) {
+        Write-Host "Cleaning and building ($Configuration)..."
+        & cmake --build --preset $presetName --clean-first
+    } else {
+        Write-Host "Building ($Configuration)..."
+        & cmake --build --preset $presetName
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "CMake build failed with exit code $LASTEXITCODE"
+    }
+} finally {
+    Pop-Location
 }
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $exe = Join-Path $repoRoot "build/windows-msvc-vcpkg/$Configuration/econv.exe"
 if (Test-Path $exe) {
