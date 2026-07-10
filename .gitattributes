@@ -1,2 +1,5 @@
 *.ps1 text eol=lf
 *.bat text eol=crlf
+*.sh text eol=lf
+*.cmake text eol=lf
+tests/fixtures/*.bin binary

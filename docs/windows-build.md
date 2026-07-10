@@ -172,6 +172,8 @@ build/windows-msvc-vcpkg/Debug/econv.exe --help
 
 如果要调试其他参数，修改 `.vscode/launch.json` 中的 `args`。
 
+跨平台测试由 `tests/smoke-test.cmake` 驱动，测试样本位于 `tests/fixtures/`。Windows、Linux 和 macOS 都通过 CTest 运行同一组测试。
+
 ## 哪些文件不提交
 
 下面这些目录和文件是本地生成物或本机配置，不提交到 Git：

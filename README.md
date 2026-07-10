@@ -55,17 +55,18 @@ Windows 下生成 Visual Studio 项目、解决方案和 VS Code 调试的完整
 
 ## 测试
 
-Windows 下先构建 Debug 版本，然后运行手工冒烟测试脚本：
+冒烟测试使用 CMake/CTest 驱动和仓库内固定编码样本，可在 Windows、Linux 和 macOS 上运行，不依赖 PowerShell：
 
 ```powershell
 cmake --build --preset windows-debug
-.\scripts\manual-test.ps1 -Configuration Debug
+ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
 ```
 
-也可以通过 CTest 运行：
+Unix 平台构建后可使用对应 test preset，例如：
 
-```powershell
-ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
+```bash
+ctest --preset linux-x64-tests
+ctest --preset macos-arm64-tests
 ```
 
 ## 版本管理与编译脚本
@@ -95,6 +96,8 @@ ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
 发布脚本会把 ZIP 和 SHA-256 校验文件生成到 `dist/`，其中包含 EXE、运行时 DLL、README、项目许可证、第三方声明和合并后的第三方许可证。使用 `-SkipRebuild` 可跳过全量重建，使用 `-KeepStaging` 可保留打包暂存目录，使用 `-OutputDirectory <path>` 可指定输出目录。
 
 发布包中的 `add-to-path.bat` 总会将发布目录添加到当前用户 `PATH`；如果它已经以管理员权限运行，还会同时添加到系统 `PATH`。脚本不会主动请求提权，更新后需要重新打开终端。执行 `add-to-path.bat --dry-run` 可预览操作而不修改任何 PATH。
+
+Linux/macOS 的构建、测试和 `tar.gz` 发布方式见 [Unix 构建与发布](docs/unix-build.md)。
 
 ## 用法
 

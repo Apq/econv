@@ -60,8 +60,10 @@ target_compile_options(econv PRIVATE
 
 install(TARGETS econv RUNTIME DESTINATION bin)
 
-if(WIN32)
-  add_test(
-    NAME manual-smoke
-    COMMAND powershell -ExecutionPolicy Bypass -File "${CMAKE_SOURCE_DIR}/scripts/manual-test.ps1" -Configuration $<CONFIG>)
-endif()
+add_test(
+  NAME smoke
+  COMMAND "${CMAKE_COMMAND}"
+    "-DECONV_EXE=$<TARGET_FILE:econv>"
+    "-DFIXTURE_DIR=${CMAKE_SOURCE_DIR}/tests/fixtures"
+    "-DTEST_OUTPUT_DIR=${CMAKE_CURRENT_BINARY_DIR}/smoke-test-output/$<CONFIG>"
+    -P "${CMAKE_SOURCE_DIR}/tests/smoke-test.cmake")
