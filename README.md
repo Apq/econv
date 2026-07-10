@@ -4,6 +4,55 @@
 
 对传统编码的检测具有概率性。`econv` 会先处理确定性的情况（BOM 和严格 UTF-8 校验），然后再回退到 `uchardet`。如果你已经知道源文件编码，或者低置信度的传统编码文件被误判，请使用 `--from` 指定源编码。
 
+## 用法
+
+仅检测编码：
+
+```bash
+econv --detect-only -i input.txt
+```
+
+自动检测并转换为 UTF-8：
+
+```bash
+econv -i input.txt -o output.txt -t UTF-8
+```
+
+强制指定源编码并转换为 GB18030：
+
+```bash
+econv -i input.txt -o output.txt --from SHIFT_JIS --to GB18030
+```
+
+使用 stdin/stdout：
+
+```bash
+cat input.txt | econv --to UTF-8 > output.txt
+```
+
+当目标编码无法表示某些字符时，允许有损转换：
+
+```bash
+econv -i input.txt -o output.txt -t ISO-8859-1 --fallback translit
+econv -i input.txt -o output.txt -t ISO-8859-1 --fallback ignore
+```
+
+## 选项
+
+```text
+  -i, --input <path>       输入文件，默认为 stdin
+  -o, --output <path>      输出文件，默认为 stdout
+  -f, --from <encoding>    强制指定源编码，而不是自动检测
+  -t, --to <encoding>      目标编码；除非使用 --detect-only，否则必填
+      --detect-only        打印检测到的编码并退出
+      --fallback <mode>    strict、ignore 或 translit；默认值：strict
+      --emit-bom           为 UTF-8/UTF-16LE/UTF-16BE/UTF-32LE/UTF-32BE 添加 BOM 前缀
+      --version            显示版本号
+  -h, --help               显示帮助
+```
+
+目标编码和源编码名称会直接传给 `iconv`，因此支持的名称取决于当前平台的 iconv 实现。
+
 ## 功能
 
 - 在使用启发式检测前先识别 UTF BOM。
@@ -118,52 +167,3 @@ git push origin v0.1
 GitHub 只有在所选 ref 本身包含工作流文件时才能手动运行该工作流。因此，早于工作流创建的旧标签（例如当前的 `v0.1`）不能直接用于 `Use workflow from`；应从 `master` 启动，并在 `发布标签` 输入框中填写 `v0.1`。
 
 工作流会等待四个平台全部构建和测试通过，然后创建或更新 GitHub Release，自动生成发布说明，并上传各平台压缩包及其 SHA-256 校验文件。压缩包文件名仍使用 `CMakeLists.txt` 和 `vcpkg.json` 中的完整项目版本。
-
-## 用法
-
-仅检测编码：
-
-```bash
-econv --detect-only -i input.txt
-```
-
-自动检测并转换为 UTF-8：
-
-```bash
-econv -i input.txt -o output.txt -t UTF-8
-```
-
-强制指定源编码并转换为 GB18030：
-
-```bash
-econv -i input.txt -o output.txt --from SHIFT_JIS --to GB18030
-```
-
-使用 stdin/stdout：
-
-```bash
-cat input.txt | econv --to UTF-8 > output.txt
-```
-
-当目标编码无法表示某些字符时，允许有损转换：
-
-```bash
-econv -i input.txt -o output.txt -t ISO-8859-1 --fallback translit
-econv -i input.txt -o output.txt -t ISO-8859-1 --fallback ignore
-```
-
-## 选项
-
-```text
-  -i, --input <path>       输入文件，默认为 stdin
-  -o, --output <path>      输出文件，默认为 stdout
-  -f, --from <encoding>    强制指定源编码，而不是自动检测
-  -t, --to <encoding>      目标编码；除非使用 --detect-only，否则必填
-      --detect-only        打印检测到的编码并退出
-      --fallback <mode>    strict、ignore 或 translit；默认值：strict
-      --emit-bom           为 UTF-8/UTF-16LE/UTF-16BE/UTF-32LE/UTF-32BE 添加 BOM 前缀
-      --version            显示版本号
-  -h, --help               显示帮助
-```
-
-目标编码和源编码名称会直接传给 `iconv`，因此支持的名称取决于当前平台的 iconv 实现。
