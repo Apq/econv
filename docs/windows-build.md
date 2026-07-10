@@ -108,7 +108,7 @@ econv.exe 的 Windows 文件版本信息
 2. 执行 CTest。
 3. 校验 EXE、CMake 与 vcpkg manifest 的版本一致。
 4. 收集 `econv.exe`、`iconv-2.dll` 和 `uchardet.dll`。
-5. 收集用于添加系统 PATH 的 `add-to-system-path.bat`。
+5. 收集用于添加 PATH 的 `add-to-path.bat`。
 6. 收集 README、项目许可证和第三方声明。
 7. 将 uchardet 与 libiconv 的完整许可证合并为根目录下单个 `THIRD-PARTY-LICENSES.txt`。
 8. 生成 Windows x64 ZIP，并生成 ZIP 的外部 `.sha256` 文件。
@@ -131,7 +131,7 @@ dist/econv-<version>-windows-x64.zip.sha256
 
 `scripts/release.bat` 是双击入口。`release.ps1` 使用 UTF-8 无 BOM 和 LF，`.bat` 使用无 BOM 和 CRLF；`.gitattributes` 会固定这两类文件的换行格式。
 
-发布包中的 `add-to-system-path.bat` 总会把该批处理文件所在目录添加到当前用户 `PATH`；如果批处理已经以管理员权限运行，还会同时添加到系统 `PATH`。脚本会分别检查用户和系统 PATH 中的重复项，不会主动请求提权；执行后需要重新打开终端。可用 `add-to-system-path.bat --dry-run` 预览操作而不修改任何 PATH。
+发布包中的 `add-to-path.bat` 总会把该批处理文件所在目录添加到当前用户 `PATH`；如果批处理已经以管理员权限运行，还会同时添加到系统 `PATH`。脚本会分别检查用户和系统 PATH 中的重复项，不会主动请求提权；执行后需要重新打开终端。可用 `add-to-path.bat --dry-run` 预览操作而不修改任何 PATH。
 
 ## 用 Visual Studio 打开
 
