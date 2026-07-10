@@ -144,7 +144,7 @@ ctest --preset macos-arm64-tests
 
 发布脚本会把 ZIP 和 SHA-256 校验文件生成到 `dist/`，其中包含 EXE、运行时 DLL、README、项目许可证、第三方声明和合并后的第三方许可证。使用 `-SkipRebuild` 可跳过全量重建，使用 `-KeepStaging` 可保留打包暂存目录，使用 `-OutputDirectory <path>` 可指定输出目录。
 
-发布包中的 `add-to-path.bat` 总会将发布目录添加到当前用户 `PATH`；如果它已经以管理员权限运行，还会同时添加到系统 `PATH`。脚本不会主动请求提权，更新后需要重新打开终端。执行 `add-to-path.bat --dry-run` 可预览操作而不修改任何 PATH。
+发布包中的 `add-to-path.bat` 总会将发布目录添加到当前用户 `PATH`；如果它已经以管理员权限运行，还会同时添加到系统 `PATH`。脚本不会主动请求提权，更新后需要重新打开终端。执行 `add-to-path.bat --dry-run` 可预览操作而不修改任何 PATH；传入 `--non-interactive` 可跳过末尾的 `pause` 等待，适用于 CI 或脚本调用。
 
 Linux/macOS 的构建、测试和 `tar.gz` 发布方式见 [Unix 构建与发布](docs/unix-build.md)。
 
