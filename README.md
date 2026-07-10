@@ -94,6 +94,8 @@ ctest --test-dir build/windows-msvc-vcpkg -C Debug --output-on-failure
 
 发布脚本会把 ZIP 和 SHA-256 校验文件生成到 `dist/`，其中包含 EXE、运行时 DLL、README、项目许可证、第三方声明和合并后的第三方许可证。使用 `-SkipRebuild` 可跳过全量重建，使用 `-KeepStaging` 可保留打包暂存目录，使用 `-OutputDirectory <path>` 可指定输出目录。
 
+发布包中的 `add-to-system-path.bat` 可将发布目录添加到系统级 `PATH`。双击后会请求管理员权限；更新后需要重新打开终端。执行 `add-to-system-path.bat --dry-run` 可只显示目标目录，不修改系统设置。
+
 ## 用法
 
 仅检测编码：

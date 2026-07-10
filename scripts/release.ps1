@@ -101,6 +101,7 @@ Write-Host "==> Collecting release files"
 Copy-RequiredFile $exe $stagingDir
 Copy-RequiredFile (Join-Path $releaseDir 'iconv-2.dll') $stagingDir
 Copy-RequiredFile (Join-Path $releaseDir 'uchardet.dll') $stagingDir
+Copy-RequiredFile (Join-Path $PSScriptRoot 'add-to-system-path.bat') $stagingDir
 Copy-RequiredFile (Join-Path $repoRoot 'README.md') $stagingDir
 Copy-RequiredFile (Join-Path $repoRoot 'LICENSE') (Join-Path $stagingDir 'LICENSE.txt')
 Copy-RequiredFile (Join-Path $repoRoot 'THIRD-PARTY-NOTICES.md') $stagingDir
@@ -166,6 +167,7 @@ try {
         "$packageName/econv.exe",
         "$packageName/iconv-2.dll",
         "$packageName/uchardet.dll",
+        "$packageName/add-to-system-path.bat",
         "$packageName/LICENSE.txt",
         "$packageName/THIRD-PARTY-NOTICES.md",
         "$packageName/THIRD-PARTY-LICENSES.txt",
