@@ -1,35 +1,24 @@
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
-set "SCRIPT_PATH=%~f0"
 set "TARGET_DIR=%~dp0"
 if "%TARGET_DIR:~-1%"=="\" set "TARGET_DIR=%TARGET_DIR:~0,-1%"
 
 if /I "%~1"=="--dry-run" (
-    echo Target directory: "%TARGET_DIR%"
-    echo Dry run: system PATH was not changed.
-    exit /b 0
+    set "DRY_RUN=1"
+) else (
+    set "DRY_RUN=0"
 )
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "if (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { exit 0 } else { exit 1 }"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$target=$env:TARGET_DIR.TrimEnd('\'); $dryRun=$env:DRY_RUN -eq '1'; $isAdmin=([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator); function Add-PathEntry([string]$scope,[string]$label) { $current=[Environment]::GetEnvironmentVariable('Path',$scope); $entries=@($current -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ }); if ($entries | Where-Object { $_.TrimEnd('\') -ieq $target }) { Write-Host ('Already present in {0} PATH: {1}' -f $label,$target); return }; if ($dryRun) { Write-Host ('Would add to {0} PATH: {1}' -f $label,$target); return }; [Environment]::SetEnvironmentVariable('Path',((@($entries)+$target) -join ';'),$scope); Write-Host ('Added to {0} PATH: {1}' -f $label,$target) }; Add-PathEntry 'User' 'user'; if ($isAdmin) { Add-PathEntry 'Machine' 'system' } else { Write-Host 'Not running as administrator; system PATH was not changed.' }; if ($dryRun) { Write-Host 'Dry run: no PATH values were changed.' }"
 if errorlevel 1 (
-    echo Administrator privileges are required. Requesting elevation...
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "Start-Process -FilePath $env:SCRIPT_PATH -Verb RunAs -WorkingDirectory $env:TARGET_DIR"
-    if errorlevel 1 (
-        echo Failed to request administrator privileges.
-        pause
-        exit /b 1
-    )
-    exit /b 0
-)
-
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$target=$env:TARGET_DIR.TrimEnd('\'); $machinePath=[Environment]::GetEnvironmentVariable('Path','Machine'); $entries=@($machinePath -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ }); if ($entries | Where-Object { $_.TrimEnd('\') -ieq $target }) { Write-Host ('Already present in system PATH: {0}' -f $target); exit 0 }; $newPath=(@($entries)+$target) -join ';'; [Environment]::SetEnvironmentVariable('Path',$newPath,'Machine'); Write-Host ('Added to system PATH: {0}' -f $target)"
-if errorlevel 1 (
-    echo Failed to update the system PATH.
+    echo Failed to update PATH.
     pause
     exit /b 1
 )
 
-echo Open a new terminal for the updated PATH to take effect.
+if "%DRY_RUN%"=="1" exit /b 0
+
+echo Open a new terminal for the updated PATH values to take effect.
 pause
 exit /b 0

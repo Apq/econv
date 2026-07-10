@@ -131,7 +131,7 @@ dist/econv-<version>-windows-x64.zip.sha256
 
 `scripts/release.bat` 是双击入口。`release.ps1` 使用 UTF-8 无 BOM 和 LF，`.bat` 使用无 BOM 和 CRLF；`.gitattributes` 会固定这两类文件的换行格式。
 
-发布包中的 `add-to-system-path.bat` 会把该批处理文件所在目录添加到系统级 `PATH`。脚本会检查重复项并请求管理员权限；执行后需要重新打开终端。可用 `add-to-system-path.bat --dry-run` 验证目标路径而不修改系统。
+发布包中的 `add-to-system-path.bat` 总会把该批处理文件所在目录添加到当前用户 `PATH`；如果批处理已经以管理员权限运行，还会同时添加到系统 `PATH`。脚本会分别检查用户和系统 PATH 中的重复项，不会主动请求提权；执行后需要重新打开终端。可用 `add-to-system-path.bat --dry-run` 预览操作而不修改任何 PATH。
 
 ## 用 Visual Studio 打开
 
