@@ -99,7 +99,7 @@ ctest --preset macos-arm64-tests
 
 Linux/macOS 的构建、测试和 `tar.gz` 发布方式见 [Unix 构建与发布](docs/unix-build.md)。
 
-## CI 与 GitHub Release
+## GitHub 发布
 
 仓库通过 GitHub Actions 在 Windows x64、Linux x64、macOS arm64 和 macOS x64 上执行 Release 构建、CTest 冒烟测试和发布包校验。工作流仅在以下情况运行：
 
@@ -113,7 +113,11 @@ git tag v0.1
 git push origin v0.1
 ```
 
-手动运行时，工作流按版本顺序选择仓库中最大的有效版本标签；如果仓库还没有版本标签，则使用 `v0.1`。手动运行始终以界面中选择的 ref 作为源码，标签只决定 GitHub Release 版本。工作流会等待四个平台全部构建和测试通过，然后创建或更新 GitHub Release，自动生成发布说明，并上传各平台压缩包及其 SHA-256 校验文件。压缩包文件名仍使用 `CMakeLists.txt` 和 `vcpkg.json` 中的完整项目版本。
+手动运行时，请将 GitHub 的 `Use workflow from` 保持为包含工作流的分支（通常是 `master`），并在 `发布标签` 输入框中指定版本标签。输入框留空时，工作流按版本顺序选择仓库中最大的有效版本标签；如果仓库还没有版本标签，则使用 `v0.1`。手动运行始终以 `Use workflow from` 中选择的 ref 作为源码，发布标签只决定 GitHub Release 版本。
+
+GitHub 只有在所选 ref 本身包含工作流文件时才能手动运行该工作流。因此，早于工作流创建的旧标签（例如当前的 `v0.1`）不能直接用于 `Use workflow from`；应从 `master` 启动，并在 `发布标签` 输入框中填写 `v0.1`。
+
+工作流会等待四个平台全部构建和测试通过，然后创建或更新 GitHub Release，自动生成发布说明，并上传各平台压缩包及其 SHA-256 校验文件。压缩包文件名仍使用 `CMakeLists.txt` 和 `vcpkg.json` 中的完整项目版本。
 
 ## 用法
 

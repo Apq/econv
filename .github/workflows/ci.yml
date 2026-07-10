@@ -1,10 +1,18 @@
-name: Build and release
+name: 发布
+
+run-name: >-
+  发布 ${{ github.event_name == 'workflow_dispatch' && (inputs.release_tag || '自动版本') || github.ref_name }}
 
 on:
   push:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "发布标签（留空时取最大版本标签，无标签时使用 v0.1）"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -37,6 +45,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REF_NAME: ${{ github.ref_name }}
           EVENT_SHA: ${{ github.sha }}
+          MANUAL_RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
 
@@ -44,13 +53,15 @@ jobs:
             release_tag="$REF_NAME"
             source_sha="$EVENT_SHA"
           else
-            release_tag=""
-            while IFS= read -r tag; do
-              if [[ "$tag" =~ ^v[0-9]+(\.[0-9]+)+$ ]]; then
-                release_tag="$tag"
-                break
-              fi
-            done < <(git tag --list 'v*' --sort=-version:refname)
+            release_tag="$MANUAL_RELEASE_TAG"
+            if [[ -z "$release_tag" ]]; then
+              while IFS= read -r tag; do
+                if [[ "$tag" =~ ^v[0-9]+(\.[0-9]+)+$ ]]; then
+                  release_tag="$tag"
+                  break
+                fi
+              done < <(git tag --list 'v*' --sort=-version:refname)
+            fi
             release_tag="${release_tag:-v0.1}"
             source_sha="$EVENT_SHA"
           fi
@@ -79,6 +90,13 @@ jobs:
           echo "release_version=${release_tag#v}" >> "$GITHUB_OUTPUT"
           echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
           echo "tag_exists=$tag_exists" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### 发布参数"
+            echo "- 发布标签：\`$release_tag\`"
+            echo "- 包版本：\`$package_version\`"
+            echo "- 源码提交：\`$source_sha\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   build:
     name: Build ${{ matrix.name }}
